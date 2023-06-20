@@ -12,7 +12,7 @@ $app->get(
         $logger = $this->get('logger');
         $pdo = $this->get('dbConnection');
         $users = $pdo->query("SELECT user_id, username FROM Users")->fetchAll(PDO::FETCH_OBJ);
-        $logger->info(SUCCESS_MESSAGE_FOR_FETCHING_USER_DETAILS);
+        $logger->debug(SUCCESS_MESSAGE_FOR_FETCHING_USER_DETAILS);
         return make_response_json($users, $response);
     }
 );
@@ -42,7 +42,7 @@ $app->post(
             $logger->info(SUCCESS_MESSAGE_FOR_USER_CREATION);
         } catch (Exception $e) {
             $logger->error(ERROR_MESSAGE_FOR_USER_CREATION);
-            return make_response_message(401, $e->getMessage(), $response);
+            return make_response_message(500, $e->getMessage(), $response);
         }
 
         return make_response_message(200, SUCCESS_MESSAGE_FOR_USER_CREATION, $response);

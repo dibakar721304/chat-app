@@ -9,6 +9,9 @@ class MessagesTest extends TestCase
 {
     protected $client;
 
+
+
+
     protected function setUp(): void
     {
         $this->client = new Client([
@@ -19,12 +22,17 @@ class MessagesTest extends TestCase
 
     public function testSendMessages_Success()
     {
-
+        $response = $this->client->post('/groups/join/', [
+            'json' => [
+                'userId' => 1,
+                'groupId'=>1
+            ],
+        ]);
         $response = $this->client->post('/chats/message/', [
             'json' => [
                 'userId' => 1,
                 'groupId'=> 1,
-                'message'=> 'testing message'
+                'message'=> 'Sending first message'
             ],
         ]);
 
@@ -40,7 +48,7 @@ class MessagesTest extends TestCase
             'json' => [
                 'wrongUserId' => 1,
                 'groupId'=> 1,
-                'message'=> 'testing message'
+                'message'=> 'Sending first message'
             ],
         ]);
 
@@ -56,7 +64,7 @@ class MessagesTest extends TestCase
             'json' => [
                 'userId' => 1,
                 'groupId'=> 500,
-                'message'=> 'testing message'
+                'message'=> 'Sending first message'
             ],
         ]);
 
@@ -65,6 +73,7 @@ class MessagesTest extends TestCase
         $responseData = json_decode($response->getBody(), true);
         $this->assertEquals('Chat group does not exist.', $responseData['message']);
     }
+
 
 
 

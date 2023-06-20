@@ -9,7 +9,6 @@ class UsersTest extends TestCase
 {
     protected $client;
 
-    protected $username;
 
     protected function setUp(): void
     {
@@ -21,10 +20,10 @@ class UsersTest extends TestCase
 
     public function testCreateUserSuccess()
     {
-        print_r($username);
+
         $response = $this->client->post('/users', [
             'json' => [
-                'username' => 'TestRandomUser'
+                'username' => 'FirstTestUser'
             ],
         ]);
 
@@ -33,7 +32,7 @@ class UsersTest extends TestCase
         $responseData = json_decode($response->getBody(), true);
         $this->assertEquals('Operation successful for user create request.', $responseData['message']);
     }
-    public function testGetResource()
+    public function testGetUserDetails()
     {
 
         $response = $this->client->get('/users');
@@ -43,17 +42,17 @@ class UsersTest extends TestCase
     }
     public function testCreateUserFailure()
     {
-    error_log($username);
-    $response = $this->client->post('/users', [
-        'json' => [
-            'username' => 'TestRandomUser'
-            ],
-        ]);
+        error_log($username);
+        $response = $this->client->post('/users', [
+            'json' => [
+                'username' => 'FirstTestUser'
+                ],
+            ]);
 
         $this->assertEquals(401, $response->getStatusCode());
 
         $responseData = json_decode($response->getBody(), true);
         $this->assertEquals('User already exists with the given name.', $responseData['message']);
 
-}
+    }
 }

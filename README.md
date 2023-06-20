@@ -4,11 +4,11 @@
 
 1) SQLite version 3.42.0 
 2) Slim 4 ( please check composer.json)
-3)  Postman v10.14( for testing)
+3) Postman v10.14( for testing)
 
 # Below are some command used:
 1) To start server: 'php -S localhost:9998 -t public'
-2) To run tests: './vendor/bin/phpunit <filePath>'
+2) To run tests: './vendor/bin/phpunit'
 3) To run formatter: 'vendor/bin/php-cs-fixer fix'
 
 

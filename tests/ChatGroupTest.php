@@ -2,6 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
+use Your\Test\Namespace\TestUtil;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -22,7 +23,7 @@ class ChatGroupTest extends TestCase
 
         $response = $this->client->post('/groups', [
             'json' => [
-                'name' => 'testChatGroup'
+                'name' => 'FirstChatGroup'
             ],
         ]);
 
@@ -36,7 +37,7 @@ class ChatGroupTest extends TestCase
 
         $response = $this->client->post('/groups', [
             'json' => [
-                'name' => 'testChatGroup'
+                'name' => 'FirstChatGroup'
             ],
         ]);
 
@@ -50,7 +51,7 @@ class ChatGroupTest extends TestCase
 
         $response = $this->client->post('/groups', [
             'json' => [
-                'randomName' => 'testChatGroup'
+                'randomName' => 'FirstChatGroup'
             ],
         ]);
 
@@ -61,7 +62,11 @@ class ChatGroupTest extends TestCase
     }
     public function testJoinChatGroup__success()
     {
-
+        $response = $this->client->post('/users', [
+            'json' => [
+                'username' => 'FirstUserInGroup'
+            ],
+        ]);
         $response = $this->client->post('/groups/join/', [
             'json' => [
                 'userId' => 1,
@@ -78,6 +83,37 @@ class ChatGroupTest extends TestCase
     {
 
         $response = $this->client->post('/groups/join/', [
+            'json' => [
+                'userId' => 1,
+                'groupId'=>200
+            ],
+        ]);
+
+        $this->assertEquals(400, $response->getStatusCode());
+
+        $responseData = json_decode($response->getBody(), true);
+        $this->assertEquals('Chat group does not exist.', $responseData['message']);
+    }
+
+    public function testLeaveChatGroup__success()
+    {
+
+        $response = $this->client->post('/groups/leave/', [
+            'json' => [
+                'userId' => 1,
+                'groupId'=>1
+            ],
+        ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $responseData = json_decode($response->getBody(), true);
+        $this->assertEquals('User has left chat group succuessfully.', $responseData['message']);
+    }
+    public function testLeaveChatGroup__failure()
+    {
+
+        $response = $this->client->post('/groups/leave/', [
             'json' => [
                 'userId' => 1,
                 'groupId'=>200

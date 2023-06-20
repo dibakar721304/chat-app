@@ -28,7 +28,8 @@ $app->post('/groups', function (Request $request, Response $response) {
         $result = $stmt->execute();
         $logger->debug(SUCCESS_MESSAGE_FOR_CHAT_GROUP_CREATION);
     } catch (Exception $e) {
-        return make_response_message(401, $e->getMessage(), $response);
+        $logger->debug(ERROR_MESSAGE_FOR_CHAT_GROUP_CREATION);
+        return make_response_message(500, $e->getMessage(), $response);
     }
 
     return make_response_message(200, SUCCESS_MESSAGE_FOR_CHAT_GROUP_CREATION, $response);
@@ -59,6 +60,11 @@ $app->post('/groups/join/', function (Request $request, Response $response) {
         $logger->error(ERROR_MESSAGE_NOT_EXISTING_CHAT_GROUP);
         return make_response_message(400, ERROR_MESSAGE_NOT_EXISTING_CHAT_GROUP, $response);
     }
+    $activeChatResult = isActiveChatExist($request);
+    if($activeChatResult) {
+        $logger->error(ERROR_MESSAGE_FOR_ACTIVE_USER_IN_CHAT_GROUP);
+        return make_response_message(400, ERROR_MESSAGE_FOR_ACTIVE_USER_IN_CHAT_GROUP, $response);
+    }
     $pdo = $this->get('dbConnection');
     $stmt = $pdo->prepare('INSERT INTO chat_group_user (chat_group_id, user_id,status) VALUES (:groupId, :userId, "ACTIVE")');
     $stmt->bindParam(':groupId', $groupId);
@@ -68,7 +74,7 @@ $app->post('/groups/join/', function (Request $request, Response $response) {
         $logger->debug(SUCCESS_MESSAGE_FOR_CHAT_GROUP_JOINING);
     } catch (Exception $e) {
         $logger->debug(ERROR_MESSAGE_FOR_CHAT_GROUP_JOINING);
-        return make_response_message(401, $e->getMessage(), $response);
+        return make_response_message(500, $e->getMessage(), $response);
     }
     return make_response_message(201, SUCCESS_MESSAGE_FOR_CHAT_GROUP_JOINING, $response);
 });
@@ -87,6 +93,10 @@ $app->post('/groups/leave/', function (Request $request, Response $response) {
         $logger->error(ERROR_MESSAGE_NOT_EXISTING_CHAT_GROUP);
         return make_response_message(400, ERROR_MESSAGE_NOT_EXISTING_CHAT_GROUP, $response);
     }
+    if(hasUserAlreadyLeft($request)) {
+        $logger->error(ERROR_MESSAGE_FOR_USER_ALREADY_LEFT);
+        return make_response_message(400, ERROR_MESSAGE_FOR_USER_ALREADY_LEFT, $response);
+    }
     $pdo = $this->get('dbConnection');
     $timestamp = date('Y-m-d H:i:s');
     $stmt = $pdo->prepare('UPDATE chat_group_user set status="INACTIVE",left_time = :timestamp where user_id= :userId and chat_group_id =:groupId');
@@ -98,7 +108,7 @@ $app->post('/groups/leave/', function (Request $request, Response $response) {
         $logger->debug(SUCCESS_MESSAGE_FOR_CHAT_GROUP_LEAVING);
     } catch (Exception $e) {
         $logger->error(ERROR_MESSAGE_FOR_CHAT_GROUP_LEAVING);
-        return make_response_message(401, $e->getMessage(), $response);
+        return make_response_message(500, $e->getMessage(), $response);
     }
     return make_response_message(200, SUCCESS_MESSAGE_FOR_CHAT_GROUP_LEAVING, $response);
 });

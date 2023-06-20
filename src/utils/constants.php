@@ -5,9 +5,10 @@ define('ERROR_MESSAGE_ALREADY_EXISTING_USER', 'User already exists with the give
 define('ERROR_MESSAGE_MISSING_DETAILS_FOR_USER', 'User details are missing.');
 define('ERROR_MESSAGE_FOR_USER_CREATION', 'User creation unsuccessful.');
 define('ERROR_MESSAGE_FOR_DELETING_USER', 'Deleting user is unsuccessful.');
+define('ERROR_MESSAGE_FOR_ACTIVE_USER_IN_CHAT_GROUP', 'User is already active member of chat group');
+define('ERROR_MESSAGE_FOR_USER_ALREADY_LEFT', 'User has already left chat group');
 define('SUCCESS_MESSAGE_FOR_USER_CREATION', 'Operation successful for user create request.');
 define('SUCCESS_MESSAGE_FOR_FETCHING_USER_DETAILS', 'Operation successful for fetching user details request.');
-define('SUCCESS_MESSAGE_FOR_USER_DELETION', 'Operation successful for user delete request.');
 
 #Chat group related messages
 define('ERROR_MESSAGE_MISSING_DETAILS_FOR_CHAT_GROUP_CREATION', 'Chat group details are missing.');

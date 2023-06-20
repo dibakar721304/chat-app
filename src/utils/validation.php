@@ -33,6 +33,25 @@ function isActiveChatExist(Request $request)
     return $isActiveChatExist;
 
 }
+function hasUserAlreadyLeft(Request $request)
+{
+    $parsedBody = $request->getBody();
+    $parsedBody = json_decode($parsedBody, true);
+    $groupId = $parsedBody["groupId"];
+    $userId = $parsedBody["userId"];
+    $container = $GLOBALS['container'];
+    $pdo = $container->get('dbConnection');
+    $stmt = $pdo->prepare('select status from chat_group_user where user_id= :userId and chat_group_id= :groupId order by chat_group_user_id desc limit 1');
+    $stmt->bindParam(':groupId', $groupId);
+    $stmt->bindParam(':userId', $userId);
+    $stmt->execute();
+    $status = $stmt->fetch(PDO::FETCH_ASSOC);
+    if(strcmp($status['status'], "ACTIVE")==0) {
+        return false;
+    }
+    return true;
+
+}
 function doesChatGroupNameAlreadyExists(Request $request, Response $response)
 {
     $parsedBody = $request->getBody();

@@ -46,7 +46,7 @@ $app->post(
                 $logger->debug(SUCCESS_CREATING_NEW_CHAT_TO_SEND_MESSAGE);
             } catch(Exception $e) {
                 $logger->error(ERROR_CREATING_NEW_CHAT_TO_SEND_MESSAGE);
-                return make_response_message(401, $e->getMessage(), $response);
+                return make_response_message(500, $e->getMessage(), $response);
             }
             #Add new message to the chat
             $logger->info(ADDING_NEW_MESSAGE_TO_CHAT);
@@ -59,7 +59,7 @@ $app->post(
                 $logger->debug(SUCCESS_CREATING_NEW_MESSAGE_TO_CHAT);
             } catch(Exception $e) {
                 $logger->error(ERROR_MESSAGE_CREATING_NEW_CHAT_MESSAGE);
-                return make_response_message(401, $e->getMessage(), $response);
+                return make_response_message(500, $e->getMessage(), $response);
             }
 
 
@@ -75,7 +75,7 @@ $app->post(
                 $logger->debug(ADDING_MESSAGES_TO_EXISTING_CHAT);
             } catch(Exception $e) {
                 $logger->error(ERROR_ADDING_MESSAGES_TO_EXISTING_CHAT);
-                return make_response_message(401, $e->getMessage(), $response);
+                return make_response_message(500, $e->getMessage(), $response);
             }
 
         }
@@ -106,7 +106,6 @@ $app->get(
             $logger->error(ERROR_MESSAGE_NOT_EXISTING_CHAT_GROUP);
             return make_response_message(400, ERROR_MESSAGE_NOT_EXISTING_CHAT_GROUP, $response);
         }
-        $pdo = $this->get('dbConnection');
         $stmt = $pdo->prepare('SELECT chat_group_user_id FROM chat_group_user WHERE chat_group_id= :groupId and user_id=:userId and status="ACTIVE" order by chat_group_user_id desc limit 1');
         $stmt->bindParam(':groupId', $groupId);
         $stmt->bindParam(':userId', $userId);
@@ -118,7 +117,9 @@ $app->get(
         }
         #Get messages for chat
         $logger->info(FETCHING_MESSAGES_FOR_CHAT_GROUP);
-        $stmt = $pdo->prepare('select * from messages where chat_group_user_id in (select chat_group_user_id from chat_group_user where chat_group_id=:groupId) order by message_id desc');
+        $stmt = $pdo->prepare('select m.message,u.username,m.sent_time from messages m , users u,  chat_group_user c 
+        on c.chat_group_user_id = m.chat_group_user_id and c.user_id=u.user_id and
+        chat_group_id=:groupId order by message_id desc;');
         $stmt->bindParam(1, $groupId);
         try {
             $stmt->execute();
@@ -126,7 +127,7 @@ $app->get(
             $logger->debug(SUCCESS_FETCHING_MESSAGES_FOR_CHAT_GROUP);
         } catch(Exception $e) {
             $logger->error(ERROR_WHILE_FETCHING_MESSAGES_FOR_CHAT_GROUP);
-            return make_response_message(401, $e->getMessage(), $response);
+            return make_response_message(500, $e->getMessage(), $response);
         }
 
 
